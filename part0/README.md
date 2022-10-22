@@ -59,31 +59,14 @@ Create a diagram depicting the situation where user creates a new note using the
 
 ### Solution
 
-![New note on Single page app](newnote-spa.png)
+![New note on Single page app](SPA-newNote.png)
 
 ```
-title 0.6: new note on single page app
+title SPA-newNote
 
-note over browser:
-When the button on the form is clicked,
-the browser will send the user input to the server.
-The Content-Type header of the request
-tells the server that the included data
-is represented in the JSON format.
-end note
-browser->server: HTTP POST https://fullstack-exampleapp.herokuapp.com/new_note_spa
-note over server:
-The server responds with status code 201 created.
-This time the server does not ask for a redirect,
-the browser stays on the same page,
-and it sends no further HTTP requests.
-end note
-server->browser: responds with HTTP status code 201
-note over browser:
-So, the browser NO reloads the Notes page.
-end note
-note over browser:
-browser executes the event handler
-that renders notes to display
-end note
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: Server responds with code 201 (created)
+note over browser: The browser does not reload the page, and renders the new element on the screen
+
+
 ```
