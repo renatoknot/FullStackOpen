@@ -1,0 +1,15 @@
+.container-course {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.container-course h1 {
+  margin-block-end: 0;
+}
+
+.container-course p {
+  margin-block-start: 0;
+  font-size: 18px;
+}
