@@ -1,0 +1,9 @@
+.numbers-title {
+  margin-block-end: 10px;
+}
+
+.list-persons {
+  list-style: none;
+  margin-block-start: 0;
+  padding-inline-start: 10px;
+}
