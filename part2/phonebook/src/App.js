@@ -8,15 +8,17 @@ import personService from "./services/persons";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
 import Persons from "./components/Persons";
+import Notification from "./components/Notification";
 
 function App() {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   const [search, setSearch] = useState("");
+  const [notification, setNotification] = useState({});
 
   useEffect(() => {
-    personService.getAll().then((initialPersons) => setPersons(initialPersons));
+    personService.getAll().then((response) => setPersons(response));
   }, [persons]);
 
   const handleChangeName = (e) => setNewName(e.target.value);
@@ -31,6 +33,13 @@ function App() {
     if (window.confirm(`Delete ${person.name}?`)) {
       personService.deletePerson(id);
       setPersons(persons.filter((person) => person.id !== id));
+      setNotification({
+        type: "error",
+        message: `${person.name} has been removed from PhoneBook`,
+      });
+      setTimeout(() => {
+        setNotification(null);
+      }, 5000);
     }
   };
 
@@ -60,6 +69,13 @@ function App() {
             );
             setNewNumber("");
             setNewName("");
+            setNotification({
+              type: "success",
+              message: `${newName}'s number has been updated successfully`,
+            });
+            setTimeout(() => {
+              setNotification(null);
+            }, 5000);
           });
       }
     } else {
@@ -71,6 +87,13 @@ function App() {
 
       personService.create(newPerson).then((response) => {
         persons.concat(response);
+        setNotification({
+          type: "success",
+          message: `Added ${newName} to PhoneBook`,
+        });
+        setTimeout(() => {
+          setNotification(null);
+        }, 5000);
         setNewName("");
         setNewNumber("");
       });
@@ -80,6 +103,14 @@ function App() {
   return (
     <div>
       <h2>Phonebook</h2>
+      {notification && (
+        <Notification
+          type={notification.type}
+          message={notification.message}
+          styles={styles}
+        />
+      )}
+
       <Filter search={search} handleSearch={handleSearch} />
 
       <h2>Add Contact</h2>
