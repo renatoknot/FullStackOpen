@@ -7,3 +7,14 @@
   margin-block-start: 0;
   padding-inline-start: 10px;
 }
+
+.list-persons li {
+  margin-bottom: 13px;
+}
+
+.deleteBtn {
+  margin-left: 10px;
+  padding: 3px 7px;
+  cursor: pointer;
+  border-radius: 10px;
+}

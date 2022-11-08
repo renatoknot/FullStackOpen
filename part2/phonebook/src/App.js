@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 
 import styles from "./App.module.css";
 
-import axios from "axios";
+import personService from "./services/persons";
 
 //Components
 import Filter from "./components/Filter";
@@ -16,9 +16,7 @@ function App() {
   const [search, setSearch] = useState("");
 
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      setPersons(response.data);
-    });
+    personService.getAll().then((initialPersons) => setPersons(initialPersons));
   }, [persons]);
 
   const handleChangeName = (e) => setNewName(e.target.value);
@@ -26,6 +24,15 @@ function App() {
   const handleChangeNumber = (e) => setNewNumber(e.target.value);
 
   const handleSearch = (e) => setSearch(e.target.value);
+
+  const handleDelete = (id) => {
+    const person = persons.find((person) => person.id === id);
+
+    if (window.confirm(`Delete ${person.name}?`)) {
+      personService.deletePerson(id);
+      setPersons(persons.filter((person) => person.id !== id));
+    }
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -35,16 +42,39 @@ function App() {
         (person) => person.name.toLowerCase() === newName.toLowerCase(),
       )
     ) {
-      alert(`${newName} is already added to Phonebook`);
-    } else {
-      setPersons((prevPersons) => [
-        ...prevPersons,
-        { name: newName, number: newNumber },
-      ]);
-    }
+      if (
+        window.confirm(
+          `${newName} is already added to Phonebook, replace the old number with a new one?`,
+        )
+      ) {
+        const person = persons.find((person) => person.name === newName);
+        const changedPerson = { ...person, number: newNumber };
 
-    setNewName("");
-    setNewNumber("");
+        personService
+          .update(changedPerson.id, changedPerson)
+          .then((returnedPerson) => {
+            setPersons(
+              persons.map((person) =>
+                person.id !== changedPerson.id ? person : returnedPerson,
+              ),
+            );
+            setNewNumber("");
+            setNewName("");
+          });
+      }
+    } else {
+      const newPerson = {
+        name: newName,
+        number: newNumber,
+        id: persons.length + 1,
+      };
+
+      personService.create(newPerson).then((response) => {
+        persons.concat(response);
+        setNewName("");
+        setNewNumber("");
+      });
+    }
   };
 
   return (
@@ -63,7 +93,12 @@ function App() {
 
       <h2 className={styles["numbers-title"]}>Numbers</h2>
 
-      <Persons styles={styles} persons={persons} search={search} />
+      <Persons
+        styles={styles}
+        persons={persons}
+        search={search}
+        deletePerson={handleDelete}
+      />
     </div>
   );
 }
