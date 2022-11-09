@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 
 import styles from "./App.module.css";
+import { v4 as uuidv4 } from "uuid";
 
 import personService from "./services/persons";
 
@@ -19,7 +20,7 @@ function App() {
 
   useEffect(() => {
     personService.getAll().then((response) => setPersons(response));
-  }, [persons]);
+  }, []);
 
   const handleChangeName = (e) => setNewName(e.target.value);
 
@@ -31,8 +32,8 @@ function App() {
     const person = persons.find((person) => person.id === id);
 
     if (window.confirm(`Delete ${person.name}?`)) {
-      personService.deletePerson(id);
-      setPersons(persons.filter((person) => person.id !== id));
+      personService.deletePerson(person.id);
+
       setNotification({
         type: "error",
         message: `${person.name} has been removed from PhoneBook`,
@@ -41,6 +42,7 @@ function App() {
         setNotification(null);
       }, 5000);
     }
+    setPersons(persons.filter((person) => person.id !== id));
   };
 
   const handleSubmit = (e) => {
@@ -61,10 +63,10 @@ function App() {
 
         personService
           .update(changedPerson.id, changedPerson)
-          .then((returnedPerson) => {
+          .then((updatedPerson) => {
             setPersons(
               persons.map((person) =>
-                person.id !== changedPerson.id ? person : returnedPerson,
+                person.id !== changedPerson.id ? person : updatedPerson,
               ),
             );
             setNewNumber("");
@@ -76,13 +78,14 @@ function App() {
             setTimeout(() => {
               setNotification(null);
             }, 5000);
+            personService.getAll().then((response) => setPersons(response));
           });
       }
     } else {
       const newPerson = {
         name: newName,
         number: newNumber,
-        id: persons.length + 1,
+        id: uuidv4(),
       };
 
       personService.create(newPerson).then((response) => {
@@ -96,6 +99,7 @@ function App() {
         }, 5000);
         setNewName("");
         setNewNumber("");
+        personService.getAll().then((response) => setPersons(response));
       });
     }
   };
